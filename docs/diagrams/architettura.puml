@@ -1,0 +1,44 @@
+@startuml
+
+rectangle Client
+
+rectangle FastAPI {
+}
+
+rectangle "Service Layer" {
+    rectangle AuthService
+    rectangle PriceService
+    rectangle AlertService
+}
+
+rectangle "Repository Layer" {
+    rectangle UserRepository
+    rectangle PriceRepository
+    rectangle AlertRepository
+}
+
+database SQLite
+
+rectangle "Brent API" 
+
+rectangle BrentService
+
+
+Client --> FastAPI
+
+FastAPI --> AuthService
+FastAPI --> PriceService
+FastAPI --> AlertService
+
+AuthService --> UserRepository
+PriceService --> PriceRepository
+AlertService --> AlertRepository
+
+UserRepository --> SQLite
+PriceRepository --> SQLite
+AlertRepository --> SQLite
+
+PriceService --> BrentService
+BrentService --> "Brent API"
+
+@enduml
