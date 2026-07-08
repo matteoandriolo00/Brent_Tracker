@@ -8,4 +8,4 @@ class BrentValue(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     value = Column(Float)
-    timestamp = Column(DateTime, default=datetime.now(datetime.timezone.utc))
+    timestamp = Column(DateTime, default=lambda: datetime.now(datetime.timezone.utc))
