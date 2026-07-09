@@ -14,58 +14,60 @@ Questa separazione è essenziale perché permette di isolare la logica dell'appl
 dalla gestione del database.
 '''
 
-from passlib.context import CryptContext
+import bcrypt
 from app.models.user import User
 from app.repositories.user_repo import UserRepository
 
-# Configurazione di passlib per l'hashing delle password con bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthService:
-    def __init__(self, user_repository: UserRepository):
-        """
-        L'AuthService ha bisogno del UserRepository per salvare o cercare gli utenti.
-        Glielo passiamo al momento della creazione (Dependency Injection).
-        """
-        self.user_repository = user_repository
+    def __init__(self, db_or_repo):
+        """Accetta una sessione SQLAlchemy o un repository già istanziato."""
+        if isinstance(db_or_repo, UserRepository):
+            self.user_repository = db_or_repo
+        else:
+            self.user_repository = UserRepository(db_or_repo)
+
+    def _normalize_password(self, password: str) -> bytes:
+        password_bytes = password.encode("utf-8")
+        if len(password_bytes) > 72:
+            password_bytes = password_bytes[:72]
+        return password_bytes
 
     def get_password_hash(self, password: str) -> str:
         """Genera l'hash di una password in chiaro."""
-        return pwd_context.hash(password)
+        password_bytes = self._normalize_password(password)
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(password_bytes, salt).decode("utf-8")
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verifica se la password in chiaro corrisponde all'hash salvato."""
-        return pwd_context.verify(plain_password, hashed_password)
+        password_bytes = self._normalize_password(plain_password)
+        return bcrypt.checkpw(password_bytes, hashed_password.encode("utf-8"))
 
-    def register_user(self, username: str, email: str, password: str) -> User:
-        """Logica di business per la registrazione (RF1)."""
-        # 1. Controlla se l'email esiste già
-        existing_user = self.user_repository.get_user_by_email(email)
+    def register_user(self, email: str, password: str, username: str | None = None) -> User:
+        """Logica di business per la registrazione."""
+
+        normalized_email = email.strip().lower()
+
+        if not username:
+            username = normalized_email.split("@", 1)[0]
+
+        existing_user = self.user_repository.get_user_by_email(normalized_email)
         if existing_user:
             raise ValueError("Email già registrata")
-        
-        # 2. Crea l'hash della password
+
         hashed_password = self.get_password_hash(password)
-        
-        # 3. Prepara l'oggetto User
-        nuovo_utente = User(
-            username=username,
-            email=email,
-            password=hashed_password
-        )
-        
-        # 4. Salva e ritorna l'utente tramite il repository
+        nuovo_utente = User(username=username, email=normalized_email, password=hashed_password)
         return self.user_repository.create_user(nuovo_utente)
 
     def authenticate_user(self, email: str, password: str) -> User | None:
-        """Logica di business per controllare le credenziali prima del login (RF2)."""
-        # 1. Cerca l'utente tramite email
-        user = self.user_repository.get_user_by_email(email)
+        """Logica di business per controllare le credenziali prima del login."""
+        normalized_email = email.strip().lower()
+        user = self.user_repository.get_user_by_email(normalized_email)
         if not user:
-            return None # Utente non trovato
-        
-        # 2. Verifica che la password sia corretta
+            return None
+
         if not self.verify_password(password, user.password):
-            return None # Password errata
-            
+            return None
+
         return user

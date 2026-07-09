@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, Float, DateTime
-from datetime import datetime
+from datetime import datetime, timezone
+from sqlalchemy import Column, DateTime, Float, Integer
 from app.core.database import Base
 
 
@@ -8,4 +8,4 @@ class BrentValue(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     value = Column(Float)
-    timestamp = Column(DateTime, default=lambda: datetime.now(datetime.timezone.utc))
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
