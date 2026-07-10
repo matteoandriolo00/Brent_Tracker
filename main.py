@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.database import Base, engine
-from app.api import prices, auth
+from app.api import prices, auth, alert
 
 # Opzionale ma consigliato: Assicura che le tabelle SQLite vengano create all'avvio 
 # se non lo hai già fatto con lo script init_db.py
@@ -16,6 +16,7 @@ app = FastAPI(
 # Registriamo il router dei prezzi che hai creato in app/api/prices.py
 app.include_router(prices.router)
 app.include_router(auth.router)
+app.include_router(alert.router)
 
 @app.get("/")
 def read_root():
