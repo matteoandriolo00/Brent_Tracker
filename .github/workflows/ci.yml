@@ -37,7 +37,7 @@ jobs:
           path: htmlcov/
 
       - name: Build Docker image
-        run: docker build -t brentwatch .
+        run: docker build -t brent-tracker .
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -51,4 +51,4 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.BRENT_USERNAME_REAL }}/brentwatch:latest
+            ${{ secrets.BRENT_USERNAME_REAL }}/brent-tracker:latest
