@@ -38,3 +38,17 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t brentwatch .
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.BRENT_USERNAME_REAL }}
+          password: ${{ secrets.BRENT }}
+
+      - name: Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.BRENT_USERNAME_REAL }}/brentwatch:latest
