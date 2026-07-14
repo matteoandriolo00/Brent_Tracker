@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.schemas.alert import AlertCreate, AlertResponse, AlertUpdateStatus
 from app.core.database import get_db
-from app.models.alert import Alert 
+from app.models.alert import Alert
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 

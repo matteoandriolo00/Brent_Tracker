@@ -38,7 +38,7 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
     auth_service = AuthService(db)
     
     # Questo metodo dovrebbe restituire l'utente se la password è corretta, altrimenti lancia un'eccezione o restituisce None
-    user = auth_service.authenticate_user(email=user_data.email, password=user_data.password)
+    user = auth_service.authenticate_user(username=user_data.username, password=user_data.password)
     
     if not user:
         raise HTTPException(status_code=401, detail="Email o password non corretti")
@@ -48,3 +48,19 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
     fake_token = f"token_fittizio_per_{user.id}"
     
     return {"access_token": fake_token, "token_type": "bearer"}
+
+@router.delete("/delete_user")
+def delete_user(username: str, db: Session = Depends(get_db)):
+    """
+    Endpoint per eliminare un utente dal database.
+    Riceve lo username dell'utente da eliminare.
+    """
+    auth_service = AuthService(db)
+    user = auth_service.user_repository.get_user_by_username(username)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Utente non trovato")
+    
+    auth_service.user_repository.delete_user(user)
+    
+    return {"status": "success", "message": f"Utente '{username}' eliminato con successo."}

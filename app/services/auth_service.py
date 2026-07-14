@@ -27,21 +27,21 @@ class AuthService:
         else:
             self.user_repository = UserRepository(db_or_repo)
 
-    def _normalize_password(self, password: str) -> bytes:
+    def normalize_password(self, password: str) -> bytes:
         password_bytes = password.encode("utf-8")
-        if len(password_bytes) > 72:
-            password_bytes = password_bytes[:72]
+        if len(password_bytes) > 12:
+            raise ValueError("La password non può superare i 12 caratteri")
         return password_bytes
 
     def get_password_hash(self, password: str) -> str:
         """Genera l'hash di una password in chiaro."""
-        password_bytes = self._normalize_password(password)
+        password_bytes = self.normalize_password(password)
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password_bytes, salt).decode("utf-8")
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verifica se la password in chiaro corrisponde all'hash salvato."""
-        password_bytes = self._normalize_password(plain_password)
+        password_bytes = self.normalize_password(plain_password)
         return bcrypt.checkpw(password_bytes, hashed_password.encode("utf-8"))
 
     def register_user(self, email: str, password: str, username: str | None = None) -> User:
@@ -50,20 +50,23 @@ class AuthService:
         normalized_email = email.strip().lower()
 
         if not username:
-            username = normalized_email.split("@", 1)[0]
+            raise ValueError("Scegliere un username")
 
-        existing_user = self.user_repository.get_user_by_email(normalized_email)
-        if existing_user:
+        existing_mail = self.user_repository.get_user_by_email(normalized_email)
+        if existing_mail:
             raise ValueError("Email già registrata")
+        existing_username = self.user_repository.get_user_by_username(username)
+        if existing_username:
+            raise ValueError("Username già registrato")
 
         hashed_password = self.get_password_hash(password)
         nuovo_utente = User(username=username, email=normalized_email, password=hashed_password)
         return self.user_repository.create_user(nuovo_utente)
 
-    def authenticate_user(self, email: str, password: str) -> User | None:
-        """Logica di business per controllare le credenziali prima del login."""
-        normalized_email = email.strip().lower()
-        user = self.user_repository.get_user_by_email(normalized_email)
+    def authenticate_user(self, username: str, password: str) -> User | None:
+        """Logica di business per controllare le credenziali prima del login usando solo lo username."""
+        normalized_username = username.strip()
+        user = self.user_repository.get_user_by_username(normalized_username)
         if not user:
             return None
 

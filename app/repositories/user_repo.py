@@ -26,3 +26,8 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(user) # Ricarica l'oggetto per ottenere l'ID generato da SQLite
         return user
+    
+    def delete_user(self, user: User) -> None:
+        """Elimina un utente dal database."""
+        self.db.delete(user)
+        self.db.commit()

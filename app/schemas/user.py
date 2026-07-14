@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
 
 class UserLogin(BaseModel):
     """Schema utilizzato per validare i dati in ingresso durante il login."""
-    email: str
+    username: str
     password: str
 
 
