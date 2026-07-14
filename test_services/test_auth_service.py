@@ -5,6 +5,8 @@ import pytest
 from app.models.user import User
 from app.services.auth_service import AuthService
 
+from hypothesis import HealthCheck, given, settings, strategies as st
+
 
 @pytest.fixture
 def service() -> AuthService:
@@ -12,9 +14,20 @@ def service() -> AuthService:
     service.user_repository = MagicMock()
     return service
 
+@settings(max_examples=30, deadline=None)
+@given(
+    password=st.text(
+        alphabet="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        min_size=6,
+        max_size=12
+    )
+)
+def test_get_password_hash_returns_a_hash_that_can_be_verified(password: str):
 
-def test_get_password_hash_returns_a_hash_that_can_be_verified(service: AuthService) -> None:
-    password = "secret123"
+    service = AuthService(db_or_repo=MagicMock())
+
+    # print debug
+    print(repr(password), len(password))
 
     hashed_password = service.get_password_hash(password)
 

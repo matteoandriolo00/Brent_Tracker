@@ -29,8 +29,6 @@ class AuthService:
 
     def normalize_password(self, password: str) -> bytes:
         password_bytes = password.encode("utf-8")
-        if len(password_bytes) > 12:
-            raise ValueError("La password non può superare i 12 caratteri")
         return password_bytes
 
     def get_password_hash(self, password: str) -> str:

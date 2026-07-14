@@ -49,9 +49,9 @@ def test_register_login_and_read_price_flow(client, monkeypatch):
     """
     # 1. Registrazione dell'utente
     register_payload = {
-        "username": "brentfan",
-        "email": "brent@example.com",
-        "password": "secret123",
+        "username": "integuser",
+        "email": "fuck@example.com",
+        "password": "secret13",
     }
     register_response = client.post("/auth/register", json=register_payload)
 
@@ -60,8 +60,8 @@ def test_register_login_and_read_price_flow(client, monkeypatch):
 
     # 2. Login con le credenziali appena create
     login_payload = {
-        "username": "brentfan",
-        "password": "secret123",
+        "username": "integuser",
+        "password": "secret13",
     }
     login_response = client.post("/auth/login", json=login_payload)
 
@@ -90,3 +90,14 @@ def test_register_login_and_read_price_flow(client, monkeypatch):
 
     history_payload = history_response.json()["data"]
     assert history_payload[0]["price"] == 123.45
+
+    # 4. Impostazione di un alert per il prezzo del Brent
+    alert_payload = {
+        "user_id": register_response.json()["user_id"],
+        "target_price": 120.00,
+        "direction": "BELOW",
+    }
+    alert_response = client.post("/alerts/", json=alert_payload)
+    assert alert_response.status_code == 201    
+
+    
