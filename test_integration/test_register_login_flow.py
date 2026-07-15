@@ -89,7 +89,8 @@ def test_register_login_and_read_price_flow(client, monkeypatch):
     assert history_response.status_code == 200
 
     history_payload = history_response.json()["data"]
-    assert history_payload[0]["price"] == 123.45
+    # il test verifica che l'ultimo prezzo salvato nello storico corrisponda a quello appena letto
+    assert history_payload[-1]["price"] == 123.45
 
     # 4. Impostazione di un alert per il prezzo del Brent
     alert_payload = {

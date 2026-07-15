@@ -37,4 +37,5 @@ class PriceService:
         """
         Richiede al repository di restituire tutto lo storico salvato.
         """
-        return self.price_repo.get_history()
+        history = self.price_repo.get_history()
+        return sorted(history, key=lambda x: x.timestamp)

@@ -2,26 +2,41 @@ from unittest.mock import patch, MagicMock
 from app.services.price_service import PriceService
 from app.models.brent import BrentValue
 from app.services.alert_service import check_and_trigger_alerts
+from hypothesis import given, strategies as st
+from datetime import datetime
 
-def test_get_price_history():
-    # 1. Prepariamo il mock del repository
+@given(
+    history=st.lists(
+        st.builds(
+            BrentValue,
+            value=st.floats(
+                min_value=0.01,
+                max_value=1000.0,
+                allow_nan=False,
+                allow_infinity=False,
+            ),
+            timestamp=st.datetimes(
+                min_value=datetime(2020, 1, 1),
+                max_value=datetime(2030, 1, 1),
+            ),
+        ),
+        max_size=100,
+    )
+)
+def test_get_price_history(history):
     mock_repo = MagicMock()
-    
-    # 2. Definiamo cosa deve restituire il mock quando chiamato
-    mock_history = [BrentValue(value=80.0), BrentValue(value=85.0)]
-    mock_repo.get_history.return_value = mock_history
-    
-    # 3. Creiamo il service iniettando il mock (Dependency Injection)
-    service = PriceService(db=None)  # Passiamo None perché non useremo il database reale
-    service.price_repo = mock_repo  # Sostituiamo il repository reale con il
-    
-    # 4. Eseguiamo la funzione
+    mock_repo.get_history.return_value = history
+
+    service = PriceService(db=None)
+    service.price_repo = mock_repo
+
     result = service.get_price_history()
-    
-    # 5. Asserzioni
-    # Verifichiamo che il risultato sia quello che abbiamo impostato nel mock
-    assert result == mock_history
-    # Verifichiamo che il service abbia effettivamente chiamato il metodo del repo
+
+    assert result == sorted(
+        history,
+        key=lambda x: x.timestamp,
+    )
+
     mock_repo.get_history.assert_called_once()
 
 # Il decoratore passa il mock di check_and_trigger_alerts come primo argomento
