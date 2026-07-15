@@ -1,7 +1,10 @@
 from unittest.mock import patch, MagicMock
 from app.services.brent_service import BrentService
+from hypothesis import given, settings, strategies as st
 
-def test_fetch_current_price_success():
+@given(st.floats(min_value=0, max_value=200))
+@settings(max_examples=50, deadline=None)
+def test_fetch_current_price_success(price):
     # mock per la risposta della richiesta HTTP
     mock_response = MagicMock()
     mock_response.json.return_value = {

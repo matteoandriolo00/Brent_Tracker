@@ -5,7 +5,7 @@ import pytest
 from app.models.user import User
 from app.services.auth_service import AuthService
 
-from hypothesis import HealthCheck, given, settings, strategies as st
+from hypothesis import given, settings, strategies as st
 
 
 @pytest.fixture

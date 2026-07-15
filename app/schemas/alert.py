@@ -22,5 +22,5 @@ class AlertResponse(BaseModel):
     direction: str
     status: str
 
-    class Config:
+    class ConfigDict:
         from_attributes = True  # Necessario per convertire il modello SQLAlchemy in JSON
