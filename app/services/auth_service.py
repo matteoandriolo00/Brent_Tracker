@@ -1,19 +1,3 @@
-'''
-register_user: fa un controllo per evitare duplicati
-                nasconde la password dietro un hash sicuro,
-                impacchetta tutto in un oggetto User 
-                e lo consegna al UserRepository 
-                che si occuperà di fare la query SQL vera e propria.
-
-authenticate_user: serve per il Login.
-                    Cerca l'utente e usa la funzione verify_password
-                    per capire se la password inserita dall'utente, una volta hashata, 
-                    è uguale a quella che abbiamo nel database.
-
-Questa separazione è essenziale perché permette di isolare la logica dell'applicazione 
-dalla gestione del database.
-'''
-
 import bcrypt
 from app.models.user import User
 from app.repositories.user_repo import UserRepository

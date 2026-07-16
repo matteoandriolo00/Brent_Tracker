@@ -84,7 +84,7 @@ def test_register_login_and_read_price_flow(client, monkeypatch):
     current_price_payload = current_price_response.json()["data"]
     assert current_price_payload["price"] == 123.45
 
-    # Verifichiamo anche che il prezzo sia stato salvato nello storico
+    # Verifichiamo prezzo salvato nello storico
     history_response = client.get("/prices/history")
     assert history_response.status_code == 200
 

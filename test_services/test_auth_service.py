@@ -1,10 +1,7 @@
 from unittest.mock import MagicMock
-
 import pytest
-
 from app.models.user import User
 from app.services.auth_service import AuthService
-
 from hypothesis import given, settings, strategies as st
 
 
@@ -25,9 +22,6 @@ def service() -> AuthService:
 def test_get_password_hash_returns_a_hash_that_can_be_verified(password: str):
 
     service = AuthService(db_or_repo=MagicMock())
-
-    # print debug
-    print(repr(password), len(password))
 
     hashed_password = service.get_password_hash(password)
 

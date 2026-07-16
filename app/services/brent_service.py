@@ -4,7 +4,7 @@ class BrentService:
     """
     Gestisce esclusivamente la comunicazione di rete con l'API esterna.
     Utilizza l'API pubblica di Yahoo Finance per ottenere in tempo reale
-    la quotazione del petrolio Brent (Ticker: BZ=F).
+    la quotazione del petrolio Brent.
     """
     
     def __init__(self):
@@ -30,13 +30,13 @@ class BrentService:
             
             data = response.json()
             
-            # Estraiamo il prezzo specifico navigando i dizionari annidati restituiti da Yahoo
+            # Estrae il prezzo specifico navigando i dizionari annidati restituiti da Yahoo
             current_price = data['chart']['result'][0]['meta']['regularMarketPrice']
             
             return float(current_price)
             
         except requests.RequestException as e:
-            # RNF5: Affidabilità. Gestiamo la mancata connessione.
+            # RNF5: Affidabilità. Gestione mancata connessione.
             print(f"Errore di comunicazione con l'API esterna: {e}")
             raise Exception("Impossibile recuperare il prezzo del Brent: errore di rete.")
             

@@ -4,7 +4,6 @@ from app.core.database import get_db
 from app.services.auth_service import AuthService
 from app.schemas.user import UserCreate, UserLogin, Token
 
-# Creiamo il router raggruppando gli endpoint sotto il tag "Autenticazione"
 router = APIRouter(prefix="/auth", tags=["Autenticazione"])
 
 @router.post("/register")
@@ -37,14 +36,12 @@ def login(user_data: UserLogin, db: Session = Depends(get_db)):
     """
     auth_service = AuthService(db)
     
-    # Questo metodo dovrebbe restituire l'utente se la password è corretta, altrimenti lancia un'eccezione o restituisce None
     user = auth_service.authenticate_user(username=user_data.username, password=user_data.password)
     
     if not user:
         raise HTTPException(status_code=401, detail="Email o password non corretti")
     
-    # In una vera app qui genereresti un token JWT usando una libreria apposita (es. python-jose).
-    # Per ora simuliamo un token base per soddisfare RF2 senza complicare troppo il codice.
+    # simulazione token
     fake_token = f"token_fittizio_per_{user.id}"
     
     return {"access_token": fake_token, "token_type": "bearer"}

@@ -42,10 +42,8 @@ def test_get_price_history(history):
 # Il decoratore passa il mock di check_and_trigger_alerts come primo argomento
 @patch('app.services.price_service.check_and_trigger_alerts')
 def test_update_and_get_price(mock_check_alerts):
-    # 1. Crea il mock per il DB (non serve passarlo come argomento al test)
+
     mock_db = MagicMock()
-    
-    # 2. Setup degli altri mock
     mock_brent_service = MagicMock()
     mock_brent_service.fetch_current_price.return_value = 90.0
     
@@ -53,15 +51,13 @@ def test_update_and_get_price(mock_check_alerts):
     expected_value = BrentValue(value=90.0)
     mock_price_repo.save_price.return_value = expected_value
     
-    # 3. Setup del servizio con il DB mockato
+    # setup del servizio con il DB mockato
     service = PriceService(db=mock_db)
     service.brent_service = mock_brent_service
     service.price_repo = mock_price_repo
 
-    # 4. Esecuzione
     result = service.update_and_get_price()
 
-    # 5. Asserzioni
     assert result == expected_value
     
     # Verifica che la funzione patchata sia stata chiamata correttamente
