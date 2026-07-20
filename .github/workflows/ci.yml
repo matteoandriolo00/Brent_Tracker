@@ -19,16 +19,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: brent-tracker-frontend/package-lock.json
 
       - name: Install Frontend Dependencies
-        working-directory: ./frontend
+        working-directory: ./brent-tracker-frontend
         run: npm ci
 
       - name: Build Frontend (Test)
-        working-directory: ./frontend
+        working-directory: ./brent-tracker-frontend
         run: npm run build
 
       - name: Set up Python
