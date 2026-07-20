@@ -1,9 +1,12 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import Base, engine
 from app.api import prices, auth, alert
+import os
 
-# Opzionale ma consigliato: Assicura che le tabelle SQLite vengano create all'avvio 
-# se non lo hai già fatto con lo script init_db.py
+# assicura che le tabelle SQLite vengano create all'avvio 
 Base.metadata.create_all(bind=engine)
 
 # Inizializza l'applicazione FastAPI
@@ -13,14 +16,28 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Registriamo il router dei prezzi che hai creato in app/api/prices.py
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Registra i router creati
 app.include_router(prices.router)
 app.include_router(auth.router)
 app.include_router(alert.router)
 
+# 1. Servi i file statici di React usando il nome corretto della cartella
+app.mount("/assets", StaticFiles(directory="brent-tracker-frontend/dist/assets"), name="assets")
+
+# 2. Quando l'utente va sulla root "/", restituisci l'index.html di React
 @app.get("/")
-def read_root():
-    """
-    Endpoint di base per verificare che il server sia acceso e funzionante.
-    """
-    return {"message": "Benvenuto nell'API di Brent Tracker!"}
+async def serve_react_app():
+    return FileResponse("brent-tracker-frontend/dist/index.html")
+
+# 3. Catch-all per React Router (gestisce la navigazione interna delle pagine)
+@app.get("/{catchall:path}")
+async def serve_react_router(catchall: str):
+    return FileResponse("brent-tracker-frontend/dist/index.html")
