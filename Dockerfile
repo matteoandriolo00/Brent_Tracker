@@ -20,6 +20,8 @@ COPY pyproject.toml uv.lock ./
 RUN pip install uv
 RUN uv sync --frozen --no-dev
 
+ENV PATH="/app/.venv/bin:$PATH"
+
 COPY . .
 
 COPY --from=frontend-builder /app-frontend/dist ./brent-tracker-frontend/dist
