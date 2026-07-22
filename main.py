@@ -4,7 +4,6 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import Base, engine
 from app.api import prices, auth, alert
-import os
 
 # assicura che le tabelle SQLite vengano create all'avvio 
 Base.metadata.create_all(bind=engine)
@@ -18,7 +17,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

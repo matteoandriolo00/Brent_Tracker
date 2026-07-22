@@ -1,6 +1,6 @@
 .venv
 __pycache__
 *.pyc
-.pytest_cache
-htmlcov
 .git
+.env
+brent-tracker-frontend/node_modules
